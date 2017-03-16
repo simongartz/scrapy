@@ -82,6 +82,10 @@ class S3FilesStore(object):
 
     AWS_ACCESS_KEY_ID = None
     AWS_SECRET_ACCESS_KEY = None
+    AWS_ENDPOINT_URL = None
+    AWS_REGION_NAME = None
+    AWS_USE_SSL = True
+    AWS_VERIFY = None
 
     POLICY = 'private'  # Overriden from settings.FILES_STORE_S3_ACL in
                         # FilesPipeline.from_settings.
@@ -96,7 +100,11 @@ class S3FilesStore(object):
             session = botocore.session.get_session()
             self.s3_client = session.create_client(
                 's3', aws_access_key_id=self.AWS_ACCESS_KEY_ID,
-                aws_secret_access_key=self.AWS_SECRET_ACCESS_KEY)
+                aws_secret_access_key=self.AWS_SECRET_ACCESS_KEY,
+                region_name=self.AWS_REGION_NAME,
+                use_ssl=self.AWS_USE_SSL,
+                verify=self.AWS_VERIFY,
+                endpoint_url=self.AWS_ENDPOINT_URL)
         else:
             from boto.s3.connection import S3Connection
             self.S3Connection = S3Connection
@@ -257,6 +265,10 @@ class FilesPipeline(MediaPipeline):
         s3store.AWS_ACCESS_KEY_ID = settings['AWS_ACCESS_KEY_ID']
         s3store.AWS_SECRET_ACCESS_KEY = settings['AWS_SECRET_ACCESS_KEY']
         s3store.POLICY = settings['FILES_STORE_S3_ACL']
+        s3store.AWS_ENDPOINT_URL = settings['AWS_ENDPOINT_URL']
+        s3store.AWS_REGION_NAME = settings['AWS_REGION_NAME']
+        s3store.AWS_USE_SSL = settings['AWS_USE_SSL']
+        s3store.AWS_VERIFY = settings['AWS_VERIFY']
 
         store_uri = settings['FILES_STORE']
         return cls(store_uri, settings=settings)
